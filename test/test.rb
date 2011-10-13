@@ -1,7 +1,7 @@
-require 'active_record'
-require 'active_record/diff'
+require 'activerecord-diff'
 require 'test/unit'
 
+require 'pry'
 
 class Person < ActiveRecord::Base
   include ActiveRecord::Diff
