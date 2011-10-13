@@ -19,14 +19,16 @@ end
 Person.create :name => 'alice', :email_address => 'alice@example.org'
 
 Person.create :name => 'bob', :email_address => 'bob@example.org'
+Person.create :name => 'BOB', :email_address => 'BOB@EXAMPLE.ORG'
 
 Person.create :name => 'eve', :email_address => 'bob@example.org'
+
 
 class TestCase < Test::Unit::TestCase
   def setup
     @people = Person.find(:all)
 
-    @alice, @bob, @eve = *@people
+    @alice, @bob, @capital_bob, @eve = *@people
   end
 
   def keysort(hash)
@@ -54,6 +56,17 @@ class TestCase < Test::Unit::TestCase
 
     assert_diff @bob, @eve, {:name => %w( bob eve )}
   end
+
+  def test_diff_with_block
+    assert_diff @bob, @capital_bob, {:name => %w( bob BOB), :email_address => %w( bob@example.org BOB@EXAMPLE.ORG )}
+    
+    diff = @bob.diff(@capital_bob) do |attrib, old, new|
+      [attrib, old.downcase, new.downcase]
+    end
+
+    assert diff.empty?
+  end
+
 
   def test_diff_against_saved_self
     assert ! @eve.diff?

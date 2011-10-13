@@ -32,6 +32,7 @@ module ActiveRecord
     end
 
     def diff(other_record = nil)
+      
       if other_record.nil?
         old_record, new_record = self.class.find(id), self
       else
@@ -40,11 +41,19 @@ module ActiveRecord
 
       if new_record.is_a?(Hash)
         diff_each(new_record) do |(attr_name, hash_value)|
-          [attr_name, old_record.send(attr_name), hash_value]
+          if block_given?
+            yield attr_name, old_record.send(attr_name), hash_value
+          else
+            [attr_name, old_record.send(attr_name), hash_value]
+          end
         end
       else
         diff_each(self.class.diff_attrs) do |attr_name|
-          [attr_name, old_record.send(attr_name), new_record.send(attr_name)]
+          if block_given?
+            yield attr_name, old_record.send(attr_name), new_record.send(attr_name)
+          else
+            [attr_name, old_record.send(attr_name), new_record.send(attr_name)]
+          end
         end
       end
     end
